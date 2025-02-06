@@ -1,0 +1,44 @@
+[
+  {
+    "Title": "Residential fire",
+    "Description": "Fire in a residential building",
+    "VideoUrl": "images/products/Firei in Factory.jpg",
+    "EmergencyServiceId": 1,
+    "UserId": 6
+  },
+  {
+    "Title": "tired Case",
+    "Description": "A person has a health crisis on the street",
+    "VideoUrl": "images/products/Person tired in Street.jpg",
+    "EmergencyServiceId": 2,
+    "UserId": 2
+  },
+  {
+    "Title": "A case of theft",
+    "Description": "A case of theft in the street",
+    "VideoUrl": "images/products/theft in the street.jpeg",
+    "EmergencyServiceId": 3,
+    "UserId": 3
+  },
+  {
+    "Title": "Fire extinguisher",
+    "Description": "Fire in a factory",
+    "VideoUrl": "images/products/Fire in a building.mp4",
+    "EmergencyServiceId": 1,
+    "UserId": 4
+  },
+  {
+    "Title": "tired Case",
+    "Description": "A person had a health crisis at home",
+    "VideoUrl": "images/products/Person tired in Home.jpg",
+    "EmergencyServiceId": 2,
+    "UserId": 2
+  },
+  {
+    "Title": "A case of assault",
+    "Description": "A case of an assault on a citizen in the street by a criminal",
+    "VideoUrl": "images/products/assault on a citizen.jpg",
+    "EmergencyServiceId": 3,
+    "UserId": 5
+  }
+]
