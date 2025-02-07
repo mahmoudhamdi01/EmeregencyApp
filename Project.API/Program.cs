@@ -1,6 +1,8 @@
 
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Project.API.Helpers;
+using Project.API.Services;
 using Project.Core.Repositories;
 using Project.Repositor;
 using Project.Repositor.Data;
@@ -25,11 +27,28 @@ namespace Project.API
             });
             builder.Services.AddScoped<IVideoRepository, VideoRepository>();
             builder.Services.AddScoped<IVideoUploadRepository, VideoUploadRepository>();
+            builder.Services.AddScoped<IEmergencyService, EmergencyService>();
+            builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            builder.Services.Configure<IISServerOptions>(options =>
+            {
+                options.MaxRequestBodySize = int.MaxValue; // Increase max request size
+            });
 
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = long.MaxValue; // Increase file size limit
+            });
 
             var app = builder.Build();
+
+            app.Use(async (context, next) =>
+            {
+                context.Request.EnableBuffering(); // Enable buffering for large files
+                await next();
+            });
+
 
             #region Update-Database
             using var Scope = app.Services.CreateScope();
