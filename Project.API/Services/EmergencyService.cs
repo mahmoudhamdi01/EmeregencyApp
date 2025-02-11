@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project.API.DTOs;
+using Project.Core.Entities;
 using Project.Repositor.Data;
 
 namespace Project.API.Services
@@ -12,10 +13,28 @@ namespace Project.API.Services
         {
             _dbContext = DbContext;
         }
+
+        public async Task AddEmergencyRequestAsync(string serviceName, EmergencyRequestDTO request)
+        {
+            var service = await GetServiceByNameAsync(serviceName);
+            if (service == null)
+                return;
+
+            var existingRequests = await GetRequestsForService(serviceName);
+
+            // Check if the request already exists
+            if (!existingRequests.Any(r => r.UserId == request.UserId && r.VideoDescription == request.VideoDescription))
+            {
+                existingRequests.Add(request); // Add the new request
+
+                // Save changes to the database (if needed)
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
         public async Task<List<EmergencyRequestDTO>> GetRequestsForService(string serviceName)
         {
-            var service = await _dbContext.emergencyServices.FirstOrDefaultAsync(s => s.ServiceName.ToLower() == serviceName.ToLower());
-
+            var service = await GetServiceByNameAsync(serviceName);
             if (service == null)
                 return new List<EmergencyRequestDTO>();
 
@@ -28,8 +47,8 @@ namespace Project.API.Services
                     UserId = video.User.UserId,
                     UserName = video.User.USerName,
                     VideoDescription = video.Description,
-                    Latitude = 0, // Use default value or provided location
-                    Longitude = 0 // Use default value or provided location
+                    Latitude = 0, // Use default or provided location
+                    Longitude = 0 // Use default or provided location
                 })
                 .ToListAsync();
 
@@ -42,15 +61,19 @@ namespace Project.API.Services
                     UserId = video.User.UserId,
                     UserName = video.User.USerName,
                     VideoDescription = video.Description,
-                    Latitude = 0, // Use default value or provided location
-                    Longitude = 0 // Use default value or provided location
+                    Latitude = 0, // Use default or provided location
+                    Longitude = 0 // Use default or provided location
                 })
                 .ToListAsync();
 
             // Combine both lists
             var requests = preloadedVideos.Concat(userUploadedVideos).ToList();
-
             return requests;
+        }
+
+        public async Task<EmergencyServices> GetServiceByNameAsync(string serviceName)
+        {
+            return await _dbContext.emergencyServices.FirstOrDefaultAsync(s => s.ServiceName.ToLower() == serviceName.ToLower());
         }
     }
 }

@@ -1,8 +1,10 @@
 
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Project.API.Helpers;
 using Project.API.Services;
+using Project.Core.Entities;
 using Project.Core.Repositories;
 using Project.Repositor;
 using Project.Repositor.Data;
@@ -28,6 +30,7 @@ namespace Project.API
             builder.Services.AddScoped<IVideoRepository, VideoRepository>();
             builder.Services.AddScoped<IVideoUploadRepository, VideoUploadRepository>();
             builder.Services.AddScoped<IEmergencyService, EmergencyService>();
+            //builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 

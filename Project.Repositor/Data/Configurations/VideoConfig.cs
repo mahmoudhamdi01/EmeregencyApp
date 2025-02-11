@@ -20,6 +20,11 @@ namespace Project.Repositor.Data.Configurations
             builder.HasOne(U => U.User)
                    .WithMany()
                    .HasForeignKey(U => U.UserId);
+
+            //builder.HasOne(V => V.EmergencyRequests)
+            //     .WithMany()
+            //     .HasForeignKey(V => V.EmergencyRequestsId)
+            //     .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

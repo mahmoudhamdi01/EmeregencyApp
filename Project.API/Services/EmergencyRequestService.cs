@@ -1,6 +1,8 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Project.API.DTOs;
+using Project.Core.Entities;
 using Project.Repositor.Data;
 
 namespace Project.API.Services
@@ -13,6 +15,27 @@ namespace Project.API.Services
         {
             _dbContext = DbContext;
         }
+
+        public async Task<User> GetUserByIdAsync(int userId)
+        {
+            return await _dbContext.users.FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        public async Task<UserUploadVideo> GetUserUploadedVideoByIdAsync(int videoId)
+        {
+            return await _dbContext.uploadVideos
+                .Include(uv => uv.User)
+                .Include(uv => uv.EmergencyService) // Directly include EmergencyService instead of Video
+                .FirstOrDefaultAsync(uv => uv.UploadVideoId == videoId);
+        }
+
+        public async Task<Video> GetVideoByIdAsync(int videoId)
+        {
+            return await _dbContext.videos
+                .Include(v => v.EmergencyService)
+                .FirstOrDefaultAsync(v => v.VideoId == videoId);
+        }
+
         public async Task<bool> SendEmergencyRequest(int userId, int videoId, double latitude, double longitude)
         {
             #region MyRegion
@@ -66,55 +89,60 @@ namespace Project.API.Services
             //return true; 
             #endregion
 
-
-            var user = await _dbContext.users.FindAsync(userId);
-
-            // Check if the video is a preloaded video
-            var video = await _dbContext.videos.FindAsync(videoId);
-
-            if (video == null)
-            {
-                // If not found in Videos, check UserUploadedVideos
-                var userUploadedVideo = await _dbContext.uploadVideos
-                    .Include(uv => uv.User) // Ensure User is loaded
-                    .FirstOrDefaultAsync(uv => uv.UploadVideoId == videoId);
-
-                if (userUploadedVideo == null || userUploadedVideo.User == null)
-                    return false;
-
-                // Use UserUploadedVideo data
-                var emergencyRequests = new EmergencyRequestDTO
-                {
-                    UserId = userUploadedVideo.User.UserId,
-                    UserName = userUploadedVideo.User.USerName,
-                    VideoDescription = userUploadedVideo.Description, // Use UserUploadedVideo's description
-                    Latitude = latitude, // Use provided location
-                    Longitude = longitude // Use provided location
-                };
-
-                // Simulate sending data to authorities
-                Console.WriteLine($"Sending emergency request for user {emergencyRequests.UserName} at location ({emergencyRequests.Latitude}, {emergencyRequests.Longitude}) with description: {emergencyRequests.VideoDescription}");
-
-                return true;
-            }
-
-            // If the video is preloaded, use its data
-            if (user == null || video == null)
-                return false;
-
-            var emergencyRequest = new EmergencyRequestDTO
-            {
-                UserId = user.UserId,
-                UserName = user.USerName,
-                VideoDescription = video.Description, // Use Video's description
-                Latitude = latitude, // Use provided location
-                Longitude = longitude // Use provided location
-            };
-
-            // Simulate sending data to authorities
-            Console.WriteLine($"Sending emergency request for user {emergencyRequest.UserName} at location ({emergencyRequest.Latitude}, {emergencyRequest.Longitude}) with description: {emergencyRequest.VideoDescription}");
-
+            Console.WriteLine($"Sending emergency request for user {userId} at location ({latitude}, {longitude}) for video ID {videoId}");
             return true;
+
+
+            #region After-Update
+            //var user = await _dbContext.users.FindAsync(userId);
+
+            //// Check if the video is a preloaded video
+            //var video = await _dbContext.videos.FindAsync(videoId);
+
+            //if (video == null)
+            //{
+            //    // If not found in Videos, check UserUploadedVideos
+            //    var userUploadedVideo = await _dbContext.uploadVideos
+            //        .Include(uv => uv.User) // Ensure User is loaded
+            //        .FirstOrDefaultAsync(uv => uv.UploadVideoId == videoId);
+
+            //    if (userUploadedVideo == null || userUploadedVideo.User == null)
+            //        return false;
+
+            //    // Use UserUploadedVideo data
+            //    var emergencyRequests = new EmergencyRequestDTO
+            //    {
+            //        UserId = userUploadedVideo.User.UserId,
+            //        UserName = userUploadedVideo.User.USerName,
+            //        VideoDescription = userUploadedVideo.Description, // Use UserUploadedVideo's description
+            //        Latitude = latitude, // Use provided location
+            //        Longitude = longitude // Use provided location
+            //    };
+
+            //    // Simulate sending data to authorities
+            //    Console.WriteLine($"Sending emergency request for user {emergencyRequests.UserName} at location ({emergencyRequests.Latitude}, {emergencyRequests.Longitude}) with description: {emergencyRequests.VideoDescription}");
+
+            //    return true;
+            //}
+
+            //// If the video is preloaded, use its data
+            //if (user == null || video == null)
+            //    return false;
+
+            //var emergencyRequest = new EmergencyRequestDTO
+            //{
+            //    UserId = user.UserId,
+            //    UserName = user.USerName,
+            //    VideoDescription = video.Description, // Use Video's description
+            //    Latitude = latitude, // Use provided location
+            //    Longitude = longitude // Use provided location
+            //};
+
+            //// Simulate sending data to authorities
+            //Console.WriteLine($"Sending emergency request for user {emergencyRequest.UserName} at location ({emergencyRequest.Latitude}, {emergencyRequest.Longitude}) with description: {emergencyRequest.VideoDescription}");
+
+            //return true;
+            #endregion
         }
     }
 }

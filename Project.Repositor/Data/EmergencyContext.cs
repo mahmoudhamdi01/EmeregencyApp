@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Project.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Project.Repositor.Data
 {
-    public class EmergencyContext : DbContext 
+    public class EmergencyContext : DbContext
     {
         public EmergencyContext(DbContextOptions<EmergencyContext> options):base(options)
         {
@@ -19,11 +21,14 @@ namespace Project.Repositor.Data
         {
             modelBuilder.Entity<EmergencyServices>()
                         .HasKey(e => e.ServiceId);
+
+           
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<User> users { get; set; }
         public DbSet<EmergencyServices> emergencyServices {  get; set; }    
+        //public DbSet<EmergencyRequest> EmergencyRequests {  get; set; }
         public DbSet<Video> videos { get; set; }
         public DbSet<UserUploadVideo> uploadVideos { get; set; }
     }

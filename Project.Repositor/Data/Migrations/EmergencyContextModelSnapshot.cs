@@ -35,7 +35,7 @@ namespace Project.Repositor.Data.Migrations
 
                     b.HasKey("ServiceId");
 
-                    b.ToTable("emergencyServices");
+                    b.ToTable("emergencyServices", (string)null);
                 });
 
             modelBuilder.Entity("Project.Core.Entities.User", b =>
@@ -46,13 +46,32 @@ namespace Project.Repositor.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("USerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Project.Core.Entities.UserUploadVideo", b =>
@@ -87,7 +106,7 @@ namespace Project.Repositor.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("uploadVideos");
+                    b.ToTable("uploadVideos", (string)null);
                 });
 
             modelBuilder.Entity("Project.Core.Entities.Video", b =>
@@ -122,7 +141,7 @@ namespace Project.Repositor.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("videos");
+                    b.ToTable("videos", (string)null);
                 });
 
             modelBuilder.Entity("Project.Core.Entities.UserUploadVideo", b =>
