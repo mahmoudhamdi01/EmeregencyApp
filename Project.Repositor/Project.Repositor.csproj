@@ -15,4 +15,19 @@
     <ProjectReference Include="..\Project.Core\Project.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\DataSeed\EmergencyService.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\DataSeed\User.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\DataSeed\UserUploadVideo.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\DataSeed\Video.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

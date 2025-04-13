@@ -48,7 +48,8 @@ namespace Project.API.Services
                     UserName = video.User.USerName,
                     VideoDescription = video.Description,
                     Latitude = 0, // Use default or provided location
-                    Longitude = 0 // Use default or provided location
+                    Longitude = 0, // Use default or provided location
+                    TimeStamp = DateTime.Now
                 })
                 .ToListAsync();
 
@@ -62,7 +63,8 @@ namespace Project.API.Services
                     UserName = video.User.USerName,
                     VideoDescription = video.Description,
                     Latitude = 0, // Use default or provided location
-                    Longitude = 0 // Use default or provided location
+                    Longitude = 0, // Use default or provided location
+                    TimeStamp = DateTime.Now
                 })
                 .ToListAsync();
 

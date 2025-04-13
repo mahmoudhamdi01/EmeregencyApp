@@ -13,19 +13,19 @@ namespace Project.Repositor.Data
         public static async Task SeedAsync(EmergencyContext DbContext)
         {
             // Seeding UsersData
-            if (!DbContext.users.Any())
-            {
-                var UsersData = File.ReadAllText("../Project.Repositor/Data/DataSeed/User.json");
-                var Users = JsonSerializer.Deserialize<List<User>>(UsersData);
-                if (Users?.Count > 0)
-                {
-                    foreach (var user in Users)
-                    {
-                        await DbContext.Set<User>().AddAsync(user);
-                    }
-                    await DbContext.SaveChangesAsync();
-                }
-            }
+            //if (!DbContext.users.Any())
+            //{
+            //    var UsersData = File.ReadAllText("../Project.Repositor/Data/DataSeed/User.json");
+            //    var Users = JsonSerializer.Deserialize<List<User>>(UsersData);
+            //    if (Users?.Count > 0)
+            //    {
+            //        foreach (var user in Users)
+            //        {
+            //            await DbContext.Set<User>().AddAsync(user);
+            //        }
+            //        await DbContext.SaveChangesAsync();
+            //    }
+            //}
             // Seeding ServicesData
             if (!DbContext.emergencyServices.Any())
             {

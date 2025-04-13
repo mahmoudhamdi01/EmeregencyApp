@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,8 @@ namespace Project.API
             builder.Services.AddScoped<IVideoRepository, VideoRepository>();
             builder.Services.AddScoped<IVideoUploadRepository, VideoUploadRepository>();
             builder.Services.AddScoped<IEmergencyService, EmergencyService>();
+            builder.Services.AddScoped<ITokenServices, TokenServices>();
+            builder.Services.AddScoped<IServices, Project.Repositor.Services>();
             //builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -43,6 +46,8 @@ namespace Project.API
             {
                 options.MultipartBodyLengthLimit = long.MaxValue; // Increase file size limit
             });
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer();
 
             var app = builder.Build();
 
@@ -77,9 +82,9 @@ namespace Project.API
                 app.UseSwaggerUI();
             }
 
-            app.UseStaticFiles();
             app.UseHttpsRedirection();
-
+            app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

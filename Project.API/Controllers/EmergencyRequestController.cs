@@ -67,7 +67,8 @@ namespace Project.API.Controllers
                 UserName = user.USerName,
                 VideoDescription = video.Description,
                 Latitude = latitude,
-                Longitude = longitude
+                Longitude = longitude,
+                TimeStamp = DateTime.Now
             };
 
             // Notify the emergency service by adding the request to their list
@@ -76,4 +77,4 @@ namespace Project.API.Controllers
             return Ok(new { Message = "Emergency request sent successfully." });
         }
     }
-}
+} 

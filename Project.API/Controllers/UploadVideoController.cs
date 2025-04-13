@@ -17,15 +17,17 @@ namespace Project.API.Controllers
         private readonly IMapper _mapper;
         private readonly EmergencyContext _context;
         private readonly IEmergencyRequestService _emergencyRequestService;
+        private readonly IConfiguration _configuration;
 
         public UploadVideoController(IVideoUploadRepository UploadRepo,
             IMapper mapper, EmergencyContext context,
-            IEmergencyRequestService emergencyRequestService)
+            IEmergencyRequestService emergencyRequestService, IConfiguration configuration)
         {
             _uploadRepo = UploadRepo;
             _mapper = mapper;
             _context = context;
             _emergencyRequestService = emergencyRequestService;
+            _configuration = configuration;
         }
 
         [HttpGet("user/{userId}")]
