@@ -1,8 +1,9 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Project.API.Helpers;
 using Project.API.Services;
 using Project.Core.Entities;
@@ -31,7 +32,8 @@ namespace Project.API
             builder.Services.AddScoped<IVideoRepository, VideoRepository>();
             builder.Services.AddScoped<IVideoUploadRepository, VideoUploadRepository>();
             builder.Services.AddScoped<IEmergencyService, EmergencyService>();
-            builder.Services.AddScoped<ITokenServices, TokenServices>();
+			builder.Services.AddScoped<IVideoTranslationService, VideoTranslationService>();
+			builder.Services.AddScoped<ITokenServices, TokenServices>();
             builder.Services.AddScoped<IServices, Project.Repositor.Services>();
             //builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
@@ -48,8 +50,24 @@ namespace Project.API
             });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer();
+			string modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
 
-            var app = builder.Build();
+			// ????? ?????? ?? ????? ?????? ??? ??? Constructor
+			builder.Services.AddScoped<IAIModelServices>(provider =>
+	                        new AIModelServices(modelPath));
+			builder.Logging.AddConsole();
+
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowAll", policy =>
+				{
+					policy.AllowAnyOrigin()
+						  .AllowAnyHeader()
+						  .AllowAnyMethod();
+				});
+			});
+
+			var app = builder.Build();
 
             app.Use(async (context, next) =>
             {
@@ -73,18 +91,33 @@ namespace Project.API
                 var Logger = LoggerFactory.CreateLogger<Program>();
                 Logger.LogError(ex, "Error Occurred During Appling Migration");
             }
-            #endregion
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+			#endregion
+		
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseAuthentication();
+			app.UseCors("AllowAll");
+
+			// ?????? ????? ????? ??????? ?? ???? images
+			app.UseStaticFiles(new StaticFileOptions
+			{
+				FileProvider = new PhysicalFileProvider(
+		Path.Combine(builder.Environment.WebRootPath, "images/products")),
+				RequestPath = "/images/products",
+				ContentTypeProvider = new FileExtensionContentTypeProvider
+				{
+					Mappings = { [".mp4"] = "video/mp4" }
+				},
+				ServeUnknownFileTypes = true // ?????? ????? ????? ???????
+			});
+
+			app.UseStaticFiles();
+			app.UseAuthentication();
             app.UseAuthorization();
 
 

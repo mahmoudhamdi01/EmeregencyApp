@@ -9,6 +9,5 @@ namespace Project.API.Services
 
         // after-update
         Task AddEmergencyRequestAsync(string serviceName, EmergencyRequestDTO request);
-        Task<Project.Core.Entities.EmergencyServices> GetServiceByNameAsync(string serviceName);
     }
 }
