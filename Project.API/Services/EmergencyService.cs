@@ -32,7 +32,6 @@ namespace Project.API.Services
 					VideoDescription = video.Description,
 					Latitude = 0, // Use default or provided location
 					Longitude = 0, // Use default or provided location
-					TimeStamp = DateTime.Now
 				})
 				.ToListAsync();
 
@@ -47,7 +46,6 @@ namespace Project.API.Services
 					VideoDescription = video.Description,
 					Latitude = 0, // Use default or provided location
 					Longitude = 0, // Use default or provided location
-					TimeStamp = DateTime.Now
 				})
 				.ToListAsync();
 

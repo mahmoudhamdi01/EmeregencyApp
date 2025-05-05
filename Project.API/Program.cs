@@ -50,11 +50,29 @@ namespace Project.API
             });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer();
-			string modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
+
+			#region AI Model
+			//builder.Services.AddSingleton<IAIModelServices>(sp =>
+			//{
+			//	var configuration = sp.GetRequiredService<IConfiguration>();
+			//	var modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
+			//	var flaskServerUrl = configuration["FlaskServerUrl"];
+			//	return new AIModelServices(new HttpClient(), configuration);
+			//}); 
+			#endregion
+
+			builder.Services.AddSingleton<IAIModelServices>(sp =>
+			{
+				var httpClient = new HttpClient();
+				httpClient.Timeout = TimeSpan.FromMinutes(5); // ????? ????? ??????? ??
+				var configuration = sp.GetRequiredService<IConfiguration>();
+				return new AIModelServices(httpClient, configuration);
+			});
+			//string modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
 
 			// ????? ?????? ?? ????? ?????? ??? ??? Constructor
-			builder.Services.AddScoped<IAIModelServices>(provider =>
-	                        new AIModelServices(modelPath));
+			//builder.Services.AddScoped<IAIModelServices>(provider =>
+			//                      new AIModelServices(modelPath));
 			builder.Logging.AddConsole();
 
 			builder.Services.AddCors(options =>
@@ -67,6 +85,8 @@ namespace Project.API
 				});
 			});
 
+
+
 			var app = builder.Build();
 
             app.Use(async (context, next) =>
@@ -74,10 +94,18 @@ namespace Project.API
                 context.Request.EnableBuffering(); // Enable buffering for large files
                 await next();
             });
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
+				app.UseHsts();
+			}
 
-
-            #region Update-Database
-            using var Scope = app.Services.CreateScope();
+			#region Update-Database
+			using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
             var LoggerFactory = Services.GetRequiredService<ILoggerFactory>();
             try
@@ -127,3 +155,4 @@ namespace Project.API
         }
     }
 }
+// D:\Projects\EmergencService\EmergencyApp\Project.API\wwwroot\Model\best_model.h5

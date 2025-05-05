@@ -49,6 +49,7 @@ namespace Project.API.Controllers
             return Ok(MappedVideos);
         }
 
+		#region MyRegion
 		//[HttpPost]
 		//public async Task<IActionResult> AddUserUploadedVideo([FromBody] UserUploadVideo newVideo)
 		//{
@@ -93,7 +94,8 @@ namespace Project.API.Controllers
 		//    var allowedExtensions = new[] { ".mp4", ".avi", ".mov" };
 		//    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
 		//    return allowedExtensions.Contains(ext);
-		//}
+		//} 
+		#endregion
 
 		#region Add-Method
 		//[HttpPost]
@@ -183,6 +185,8 @@ namespace Project.API.Controllers
 				await videoFile.CopyToAsync(stream);
 			}
 
+			
+
 			// Generate a public URL for the video
 			//var videoUrl = $"https://localhost:7040/videos/{videoFile.FileName}";
 			// var customBaseUrl = _configuration["APIVideoUrl"].TrimEnd('/');
@@ -190,7 +194,7 @@ namespace Project.API.Controllers
 			var videoUrl = Path.Combine(baseUrl, videoFile.FileName).Replace("\\", "/");
 
 
-			var description = await _aIModelServices.TranslateVideoToTextAsync(videoUrl);
+			var description = await _aIModelServices.TranslateVideoToTextAsync(filePath);
 			if (string.IsNullOrEmpty(description))
 				return StatusCode(500, "Failed to translate the video.");
 
@@ -239,6 +243,8 @@ namespace Project.API.Controllers
 			var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
 			return allowedExtensions.Contains(ext);
 		}
+
+		
 		#endregion
 
 
