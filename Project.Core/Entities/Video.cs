@@ -15,7 +15,8 @@ namespace Project.Core.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-        [ForeignKey("EmergencyServiceId")]
+		public DateTime UploadTime { get; set; } = DateTime.Now;
+		[ForeignKey("EmergencyServiceId")]
         public int EmergencyServiceId { get; set; }
         public EmergencyServices EmergencyService { get; set; }
         [ForeignKey("UserId")]

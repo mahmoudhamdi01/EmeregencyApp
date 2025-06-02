@@ -176,7 +176,8 @@ namespace Project.API.Controllers
 					video = new Video
 					{
 						Description = userUploadedVideo.Description,
-						EmergencyServiceId = userUploadedVideo.EmergencyServiceId
+						EmergencyServiceId = userUploadedVideo.EmergencyServiceId,
+						UploadTime = userUploadedVideo.UploadTime
 					};
 				}
 
@@ -191,7 +192,7 @@ namespace Project.API.Controllers
 					VideoDescription = video.Description, // Use the video's description
 					Latitude = latitude,
 					Longitude = longitude,
-					TimeStamp = DateTime.Now
+					TimeStamp = video.UploadTime
 				};
 
 				// Notify the emergency service by sending the request

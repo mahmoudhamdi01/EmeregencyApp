@@ -9,7 +9,7 @@ namespace Project.API.DTOs
         public string Title { get; set; }
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-        public int EmergencyServiceId { get; set; }
+		public int EmergencyServiceId { get; set; }
         public string EmergencyService { get; set; }
         public int UserId { get; set; }
         public string? User { get; set; }

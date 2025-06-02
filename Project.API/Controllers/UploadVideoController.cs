@@ -220,11 +220,13 @@ namespace Project.API.Controllers
 				Description = description,
 				VideoUrl = videoUrl,
 				UserId = userId,
-				EmergencyServiceId = serviceId
+				EmergencyServiceId = serviceId,
+				//UploadTime = DateTime.Now
 			};
-
 			// Add the video to the database using Repository
 			var addedVideo = await _uploadRepo.AddUserUploadedVideo(userUploadedVideo);
+
+			var UploadVideoDTO = _mapper.Map<UserUploadVideo, UploadVideoDTO>(addedVideo);
 
 			if (addedVideo == null)
 				return StatusCode(500, "Failed to add the video to the database.");
@@ -233,7 +235,7 @@ namespace Project.API.Controllers
 			bool isSent = await _emergencyRequestService.SendEmergencyRequest(userId, addedVideo.UploadVideoId, latitude, longitude);
 
 			if (isSent)
-				return CreatedAtAction(nameof(GetUserUploadedVideoById), new { id = addedVideo.UploadVideoId }, addedVideo);
+				return CreatedAtAction(nameof(GetUserUploadedVideoById), new { id = addedVideo.UploadVideoId }, UploadVideoDTO);
 			return StatusCode(500, "Failed to send emergency request.");
 		}
 
