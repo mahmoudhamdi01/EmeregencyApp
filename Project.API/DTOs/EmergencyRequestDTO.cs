@@ -7,6 +7,7 @@
         public string VideoDescription { get; set; }
         public double Latitude { get; set; } 
         public double Longitude { get; set; }
-        public DateTime TimeStamp { get; set; } = DateTime.Now;
+		public int ServiceId { get; set; }
+		public DateTime TimeStamp { get; set; } = DateTime.Now;
     }
 }

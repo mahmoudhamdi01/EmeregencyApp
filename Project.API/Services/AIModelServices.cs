@@ -1,6 +1,4 @@
-﻿
-
-using Keras.Models;
+﻿using Keras.Models;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 
