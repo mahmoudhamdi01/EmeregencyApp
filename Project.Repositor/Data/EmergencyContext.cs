@@ -31,5 +31,6 @@ namespace Project.Repositor.Data
         //public DbSet<EmergencyRequest> EmergencyRequests {  get; set; }
         public DbSet<Video> videos { get; set; }
         public DbSet<UserUploadVideo> uploadVideos { get; set; }
-    }
+        public DbSet<EmergencyRequest> emergencyRequests { get; set; }
+	}
 }

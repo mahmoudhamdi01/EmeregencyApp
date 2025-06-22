@@ -26,12 +26,6 @@ namespace Project.API.Controllers
             return Ok(requests);
         }
 
-		//[HttpPost("{serviceName}")]
-		//public async Task<IActionResult> AddEmergencyRequest(string serviceName, [FromBody] EmergencyRequestDTO request)
-		//{
-		//	await _emergencyService.AddEmergencyRequestAsync(serviceName, request);
-		//	return Ok(new { message = "Emergency request sent successfully." });
-		//}
 
 	}
 }

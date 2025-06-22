@@ -84,6 +84,7 @@ namespace Project.API
 						  .AllowAnyMethod();
 				});
 			});
+			
 
 
 			var app = builder.Build();

@@ -1,8 +1,10 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Project.API.DTOs;
+using Project.API.Helpers;
 using Project.Core.Entities;
 using Project.Repositor.Data;
 using System.Text;
@@ -12,11 +14,13 @@ namespace Project.API.Services
     public class EmergencyRequestService : IEmergencyRequestService
     {
         private readonly EmergencyContext _dbContext;
+		
 
-        public EmergencyRequestService(EmergencyContext DbContext)
+		public EmergencyRequestService(EmergencyContext DbContext)
         {
             _dbContext = DbContext;
-        }
+			
+		}
 
         public async Task<User> GetUserByIdAsync(int userId)
         {
@@ -309,126 +313,344 @@ namespace Project.API.Services
 		//} 
 		#endregion
 
+		//#region قبل اخر تعديل
+		//public async Task<bool> SendEmergencyRequest(int userId, int videoId, double latitude, double longitude)
+		//{
+		//	//try
+		//	//{
+		//	//	// Retrieve user
+		//	//	var user = await _dbContext.users.FindAsync(userId);
+		//	//	if (user == null)
+		//	//	{
+		//	//		Console.WriteLine($"User with ID {userId} not found.");
+		//	//		return false;
+		//	//	}
+
+		//	//	// Try to get from UserUploadVideos first
+		//	//	var uploadVideo = await _dbContext.uploadVideos.FindAsync(videoId);
+		//	//	int? serviceId = null;
+		//	//	string description = null;
+		//	//	DateTime? uploadTime = null;
+
+		//	//	if (uploadVideo != null)
+		//	//	{
+		//	//		serviceId = uploadVideo.EmergencyServiceId;
+		//	//		description = uploadVideo.Description;
+		//	//		uploadTime = uploadVideo.UploadTime;
+		//	//	}
+		//	//	else
+		//	//	{
+		//	//		var staticVideo = await _dbContext.videos.FindAsync(videoId);
+		//	//		if (staticVideo == null)
+		//	//		{
+		//	//			Console.WriteLine($"Video with ID {videoId} not found in both tables.");
+		//	//			return false;
+		//	//		}
+		//	//		serviceId = staticVideo.EmergencyServiceId;
+		//	//		description = staticVideo.Description;
+		//	//		uploadTime = staticVideo.UploadTime;
+		//	//	}
+
+		//	//	if (serviceId == null)
+		//	//	{
+		//	//		Console.WriteLine($"Service ID not found for video {videoId}.");
+		//	//		return false;
+		//	//	}
+
+		//	//	var service = await _dbContext.emergencyServices.FindAsync(serviceId);
+		//	//	if (service == null)
+		//	//	{
+		//	//		Console.WriteLine($"Emergency service with ID {serviceId} not found.");
+		//	//		return false;
+		//	//	}
+
+		//	//	// Prepare DTO then call main version
+		//	//	var request = new EmergencyRequestDTO
+		//	//	{
+		//	//		UserId = user.UserId,
+		//	//		UserName = user.USerName,
+		//	//		VideoDescription = description,
+		//	//		Latitude = latitude,
+		//	//		Longitude = longitude,
+		//	//		TimeStamp = uploadTime ?? DateTime.UtcNow,
+		//	//		ServiceId = service.ServiceId
+		//	//	};
+
+		//	//	return await SendEmergencyRequest(request);
+		//	//}
+		//	//catch (Exception ex)
+		//	//{
+		//	//	Console.WriteLine($"Error sending emergency request: {ex.Message}");
+		//	//	return false;
+		//	//}
+
+		//	var user = await _dbContext.users.FindAsync(userId);
+
+		//	// Check if the video is a preloaded video
+		//	var video = await _dbContext.videos.FindAsync(videoId);
+
+		//	if (video == null)
+		//	{
+		//		// If not found in Videos, check UserUploadedVideos
+		//		var userUploadedVideo = await _dbContext.uploadVideos
+		//			.Include(uv => uv.User) // Ensure User is loaded
+		//			.FirstOrDefaultAsync(uv => uv.UploadVideoId == videoId);
+
+		//		if (userUploadedVideo == null || userUploadedVideo.User == null)
+		//			return false;
+
+		//		// Use UserUploadedVideo data
+		//		var emergencyRequests = new EmergencyRequestDTO
+		//		{
+		//			UserId = userUploadedVideo.User.UserId,
+		//			UserName = userUploadedVideo.User.USerName,
+		//			VideoDescription = userUploadedVideo.Description, // Use UserUploadedVideo's description
+		//			Latitude = latitude, // Use provided location
+		//			Longitude = longitude // Use provided location
+		//		};
+
+		//		// Simulate sending data to authorities
+		//		Console.WriteLine($"Sending emergency request for user {emergencyRequests.UserName} at location ({emergencyRequests.Latitude}, {emergencyRequests.Longitude}) with description: {emergencyRequests.VideoDescription}");
+
+		//		return true;
+		//	}
+
+		//	// If the video is preloaded, use its data
+		//	if (user == null || video == null)
+		//		return false;
+
+		//	var emergencyRequest = new EmergencyRequestDTO
+		//	{
+		//		UserId = user.UserId,
+		//		UserName = user.USerName,
+		//		VideoDescription = video.Description, // Use Video's description
+		//		Latitude = latitude, // Use provided location
+		//		Longitude = longitude // Use provided location
+		//	};
+
+		//	// Simulate sending data to authorities
+		//	Console.WriteLine($"Sending emergency request for user {emergencyRequest.UserName} at location ({emergencyRequest.Latitude}, {emergencyRequest.Longitude}) with description: {emergencyRequest.VideoDescription}");
+
+		//	return true;
+
+		//}
+		//#endregion
+
+
+		//public async Task<bool> SendEmergencyRequest(int userId, int videoId, double latitude, double longitude)
+		//{
+		//	try
+		//	{
+		//		var user = await _dbContext.users.FindAsync(userId);
+		//		if (user == null)
+		//		{
+		//			Console.WriteLine($"User with ID {userId} not found.");
+		//			return false;
+		//		}
+
+		//		// Try UserUploadedVideo first
+		//		var userUploadedVideo = await _dbContext.uploadVideos.FindAsync(videoId);
+		//		int? serviceId = null;
+		//		string description = null;
+		//		DateTime? uploadTime = null;
+
+		//		if (userUploadedVideo != null)
+		//		{
+		//			serviceId = userUploadedVideo.EmergencyServiceId;
+		//			description = userUploadedVideo.Description;
+		//			uploadTime = userUploadedVideo.UploadTime;
+		//		}
+		//		else
+		//		{
+		//			var video = await _dbContext.videos.FindAsync(videoId);
+		//			if (video == null)
+		//			{
+		//				Console.WriteLine($"Video with ID {videoId} not found in both tables.");
+		//				return false;
+		//			}
+		//			serviceId = video.EmergencyServiceId;
+		//			description = video.Description;
+		//			uploadTime = video.UploadTime;
+		//		}
+
+		//		if (serviceId == null)
+		//		{
+		//			Console.WriteLine($"Service ID not found for video {videoId}.");
+		//			return false;
+		//		}
+
+		//		// Get the actual service name
+		//		var service = await _dbContext.emergencyServices.FindAsync(serviceId);
+		//		if (service == null)
+		//		{
+		//			Console.WriteLine($"Emergency service with ID {serviceId} not found.");
+		//			return false;
+		//		}
+
+		//		// Build request DTO
+		//		var emergencyRequest = new EmergencyRequestDTO
+		//		{
+		//			UserId = user.UserId,
+		//			UserName = user.USerName,
+		//			VideoDescription = description,
+		//			Latitude = latitude,
+		//			Longitude = longitude,
+		//			ServiceId = service.ServiceId,
+		//			TimeStamp = uploadTime ?? DateTime.UtcNow
+		//		};
+
+		//		// ✅ Here: use the actual HTTP POST
+		//		return await SendRequestToExternalService(service.ServiceName, emergencyRequest);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Console.WriteLine($"Error sending emergency request: {ex.Message}");
+		//		return false;
+		//	}
+		//}
+
+
+		#region Correct
 		public async Task<bool> SendEmergencyRequest(int userId, int videoId, double latitude, double longitude)
 		{
-			//try
-			//{
-			//	// Retrieve user
-			//	var user = await _dbContext.users.FindAsync(userId);
-			//	if (user == null)
-			//	{
-			//		Console.WriteLine($"User with ID {userId} not found.");
-			//		return false;
-			//	}
-
-			//	// Try to get from UserUploadVideos first
-			//	var uploadVideo = await _dbContext.uploadVideos.FindAsync(videoId);
-			//	int? serviceId = null;
-			//	string description = null;
-			//	DateTime? uploadTime = null;
-
-			//	if (uploadVideo != null)
-			//	{
-			//		serviceId = uploadVideo.EmergencyServiceId;
-			//		description = uploadVideo.Description;
-			//		uploadTime = uploadVideo.UploadTime;
-			//	}
-			//	else
-			//	{
-			//		var staticVideo = await _dbContext.videos.FindAsync(videoId);
-			//		if (staticVideo == null)
-			//		{
-			//			Console.WriteLine($"Video with ID {videoId} not found in both tables.");
-			//			return false;
-			//		}
-			//		serviceId = staticVideo.EmergencyServiceId;
-			//		description = staticVideo.Description;
-			//		uploadTime = staticVideo.UploadTime;
-			//	}
-
-			//	if (serviceId == null)
-			//	{
-			//		Console.WriteLine($"Service ID not found for video {videoId}.");
-			//		return false;
-			//	}
-
-			//	var service = await _dbContext.emergencyServices.FindAsync(serviceId);
-			//	if (service == null)
-			//	{
-			//		Console.WriteLine($"Emergency service with ID {serviceId} not found.");
-			//		return false;
-			//	}
-
-			//	// Prepare DTO then call main version
-			//	var request = new EmergencyRequestDTO
-			//	{
-			//		UserId = user.UserId,
-			//		UserName = user.USerName,
-			//		VideoDescription = description,
-			//		Latitude = latitude,
-			//		Longitude = longitude,
-			//		TimeStamp = uploadTime ?? DateTime.UtcNow,
-			//		ServiceId = service.ServiceId
-			//	};
-
-			//	return await SendEmergencyRequest(request);
-			//}
-			//catch (Exception ex)
-			//{
-			//	Console.WriteLine($"Error sending emergency request: {ex.Message}");
-			//	return false;
-			//}
-
-			var user = await _dbContext.users.FindAsync(userId);
-
-			// Check if the video is a preloaded video
-			var video = await _dbContext.videos.FindAsync(videoId);
-
-			if (video == null)
+			try
 			{
-				// If not found in Videos, check UserUploadedVideos
-				var userUploadedVideo = await _dbContext.uploadVideos
-					.Include(uv => uv.User) // Ensure User is loaded
-					.FirstOrDefaultAsync(uv => uv.UploadVideoId == videoId);
+				var user = await _dbContext.users.FindAsync(userId);
+				if (user == null) return false;
 
-				if (userUploadedVideo == null || userUploadedVideo.User == null)
-					return false;
+				var userUploadedVideo = await _dbContext.uploadVideos.FindAsync(videoId);
+				int? serviceId = null;
+				string description = null;
 
-				// Use UserUploadedVideo data
-				var emergencyRequests = new EmergencyRequestDTO
+				if (userUploadedVideo != null)
 				{
-					UserId = userUploadedVideo.User.UserId,
-					UserName = userUploadedVideo.User.USerName,
-					VideoDescription = userUploadedVideo.Description, // Use UserUploadedVideo's description
-					Latitude = latitude, // Use provided location
-					Longitude = longitude // Use provided location
+					serviceId = userUploadedVideo.EmergencyServiceId;
+					description = userUploadedVideo.Description;
+				}
+				else
+				{
+					var video = await _dbContext.videos.FindAsync(videoId);
+					if (video == null) return false;
+
+					serviceId = video.EmergencyServiceId;
+					description = video.Description;
+				}
+
+				var service = await _dbContext.emergencyServices.FindAsync(serviceId);
+				if (service == null) return false;
+
+				var newRequest = new EmergencyRequest
+				{
+					UserId = user.UserId,
+					UserName = user.USerName,
+					VideoDescription = description,
+					Latitude = latitude,
+					Longitude = longitude,
+					ServiceId = service.ServiceId,
+					ServiceName = service.ServiceName,
+					TimeStamp = DateTime.UtcNow
 				};
 
-				// Simulate sending data to authorities
-				Console.WriteLine($"Sending emergency request for user {emergencyRequests.UserName} at location ({emergencyRequests.Latitude}, {emergencyRequests.Longitude}) with description: {emergencyRequests.VideoDescription}");
+				_dbContext.emergencyRequests.Add(newRequest);
+				await _dbContext.SaveChangesAsync();
 
 				return true;
 			}
-
-			// If the video is preloaded, use its data
-			if (user == null || video == null)
-				return false;
-
-			var emergencyRequest = new EmergencyRequestDTO
+			catch (Exception ex)
 			{
-				UserId = user.UserId,
-				UserName = user.USerName,
-				VideoDescription = video.Description, // Use Video's description
-				Latitude = latitude, // Use provided location
-				Longitude = longitude // Use provided location
-			};
-
-			// Simulate sending data to authorities
-			Console.WriteLine($"Sending emergency request for user {emergencyRequest.UserName} at location ({emergencyRequest.Latitude}, {emergencyRequest.Longitude}) with description: {emergencyRequest.VideoDescription}");
-
-			return true;
-
+				Console.WriteLine($"Error: {ex.Message}");
+				return false;
+			}
 		}
+		#endregion
+
+
+
+
+		//public async Task<bool> SendEmergencyRequest(int userId, int videoId, double latitude, double longitude)
+		//{
+		//	try
+		//	{
+		//		// 1️⃣ تأكد من وجود المستخدم
+		//		var user = await _dbContext.users.FindAsync(userId);
+		//		if (user == null)
+		//		{
+		//			Console.WriteLine($"❌ User with ID {userId} not found.");
+		//			return false;
+		//		}
+
+		//		// 2️⃣ تأكد من وجود الفيديو واحصل على الوصف حسب نوعه
+		//		string description = null;
+		//		int? serviceId = null;
+		//		DateTime? uploadTime = null;
+
+		//		// تحقق أولاً في جدول UserUploadedVideos (يعني فيديو مستخدم)
+		//		var userUploadedVideo = await _dbContext.uploadVideos.FindAsync(videoId);
+		//		if (userUploadedVideo != null)
+		//		{
+		//			description = userUploadedVideo.Description; // وصف AI
+		//			serviceId = userUploadedVideo.EmergencyServiceId;
+		//			uploadTime = userUploadedVideo.UploadTime;
+		//		}
+		//		else
+		//		{
+		//			// لو مش موجود في الجدول الأول → ابحث في الجدول الجاهز
+		//			var video = await _dbContext.videos.FindAsync(videoId);
+		//			if (video != null)
+		//			{
+		//				description = video.Description; // وصف جاهز مكتوب
+		//				serviceId = video.EmergencyServiceId;
+		//				uploadTime = video.UploadTime;
+		//			}
+		//			else
+		//			{
+		//				Console.WriteLine($"❌ Video with ID {videoId} not found in both tables.");
+		//				return false;
+		//			}
+		//		}
+
+		//		// 3️⃣ تحقق من الـ Service
+		//		if (serviceId == null)
+		//		{
+		//			Console.WriteLine($"❌ Service ID not found for video {videoId}.");
+		//			return false;
+		//		}
+
+		//		var service = await _dbContext.emergencyServices.FindAsync(serviceId);
+		//		if (service == null)
+		//		{
+		//			Console.WriteLine($"❌ Emergency service with ID {serviceId} not found.");
+		//			return false;
+		//		}
+
+		//		// 4️⃣ أنشئ EmergencyRequest جديد وخزنه في الداتابيز
+		//		var emergencyRequest = new EmergencyRequest
+		//		{
+		//			UserId = user.UserId,
+		//			UserName = user.USerName,
+		//			VideoDescription = description,
+		//			Latitude = latitude,
+		//			Longitude = longitude,
+		//			ServiceId = service.ServiceId,
+		//			ServiceName = service.ServiceName,
+		//			TimeStamp = uploadTime ?? DateTime.UtcNow
+		//		};
+
+		//		_dbContext.emergencyRequests.Add(emergencyRequest);
+		//		await _dbContext.SaveChangesAsync();
+
+		//		Console.WriteLine($"✅ Emergency request saved for service: {service.ServiceName}.");
+		//		return true;
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Console.WriteLine($"❌ Error sending emergency request: {ex.Message}");
+		//		return false;
+		//	}
+		//}
+
+
+
 
 		#region Error
 		//public async Task<bool> SendEmergencyRequest(EmergencyRequestDTO request)

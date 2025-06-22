@@ -210,72 +210,117 @@ namespace Project.API.Controllers
 		//}
 
 
+		#region Correct
+		//[HttpPost("select-video")]
+		//public async Task<ActionResult<EmergencyRequestDTO>> SelectVideoForEmergencyRequest(
+		//[FromBody] SelectVideoRequest model)
+		//{
+		//	try
+		//	{
+		//		// Validate input
+		//		if (model == null || model.VideoId <= 0 || model.UserId <= 0)
+		//			return BadRequest("Invalid input data.");
+
+		//		// Get user data
+		//		var user = await _emergencyRequest.GetUserByIdAsync(model.UserId);
+		//		if (user == null)
+		//			return NotFound(new { Message = $"User with ID {model.UserId} not found." });
+
+		//		// Get video data
+		//		var video = await _emergencyRequest.GetVideoByIdAsync(model.VideoId);
+
+		//		if (video == null)
+		//		{
+		//			var userUploadedVideo = await _emergencyRequest.GetUserUploadedVideoByIdAsync(model.VideoId);
+		//			if (userUploadedVideo == null || userUploadedVideo.User == null)
+		//				return NotFound(new { Message = $"Video with ID {model.VideoId} not found." });
+
+		//			// Use the description and upload time from UserUploadedVideo
+		//			video = new Video
+		//			{
+		//				Description = userUploadedVideo.Description,
+		//				EmergencyServiceId = userUploadedVideo.EmergencyServiceId,
+		//				UploadTime = userUploadedVideo.UploadTime // Use the stored upload time
+		//			};
+		//		}
+
+		//		if (video == null)
+		//			return NotFound(new { Message = $"Video with ID {model.VideoId} not found." });
+
+		//		// Create the emergency request DTO
+		//		var emergencyRequest = new EmergencyRequestDTO
+		//		{
+		//			UserId = user.UserId,
+		//			UserName = user.USerName,
+		//			VideoDescription = video.Description, // Use the video's description
+		//			Latitude = model.Latitude,
+		//			Longitude = model.Longitude,
+		//			TimeStamp = video.UploadTime // Use the stored upload time
+		//		};
+
+		//		// Notify the emergency service by sending the request
+		//		bool isSent = await _emergencyRequest.SendEmergencyRequest(
+		//			model.UserId,
+		//			model.VideoId,
+		//			model.Latitude,
+		//			model.Longitude);
+
+		//		if (!isSent)
+		//			return StatusCode(500, new { Message = "Failed to send emergency request." });
+
+		//		// Return a successful response with details
+		//		return Ok(emergencyRequest);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		return StatusCode(500, new { Message = $"Internal server error: {ex.Message}" });
+		//	}
+		//}
+		#endregion
+
 		[HttpPost("select-video")]
-		public async Task<ActionResult<EmergencyRequestDTO>> SelectVideoForEmergencyRequest(
-		[FromBody] SelectVideoRequest model)
+		public async Task<ActionResult> SelectVideo([FromBody] SelectVideoRequest dto)
 		{
-			try
+			if (dto == null)
+				return BadRequest("Invalid request body.");
+
+			// 1️⃣ تحقق من وجود المستخدم
+			var user = await _context.users.FindAsync(dto.UserId);
+			if (user == null)
+				return NotFound($"User with ID {dto.UserId} not found.");
+
+			// 2️⃣ تحقق من وجود الفيديو في جدول Videos (فقط الفيديوهات الجاهزة)
+			var video = await _context.videos.FindAsync(dto.VideoId);
+			if (video == null)
+				return NotFound($"Video with ID {dto.VideoId} not found.");
+
+			// 3️⃣ تحقق من الخدمة
+			var service = await _context.emergencyServices.FindAsync(video.EmergencyServiceId);
+			if (service == null)
+				return NotFound($"Emergency service with ID {video.EmergencyServiceId} not found.");
+
+			// 4️⃣ جهز الـ EmergencyRequest
+			var emergencyRequest = new EmergencyRequest
 			{
-				// Validate input
-				if (model == null || model.VideoId <= 0 || model.UserId <= 0)
-					return BadRequest("Invalid input data.");
+				UserId = user.UserId,
+				UserName = user.USerName,
+				VideoDescription = video.Description, // ✅ from ready video
+				Latitude = dto.Latitude,
+				Longitude = dto.Longitude,
+				ServiceId = video.EmergencyServiceId,
+				ServiceName = service.ServiceName,
+				TimeStamp = DateTime.UtcNow
+			};
 
-				// Get user data
-				var user = await _emergencyRequest.GetUserByIdAsync(model.UserId);
-				if (user == null)
-					return NotFound(new { Message = $"User with ID {model.UserId} not found." });
+			_context.emergencyRequests.Add(emergencyRequest);
+			await _context.SaveChangesAsync();
 
-				// Get video data
-				var video = await _emergencyRequest.GetVideoByIdAsync(model.VideoId);
-
-				if (video == null)
-				{
-					var userUploadedVideo = await _emergencyRequest.GetUserUploadedVideoByIdAsync(model.VideoId);
-					if (userUploadedVideo == null || userUploadedVideo.User == null)
-						return NotFound(new { Message = $"Video with ID {model.VideoId} not found." });
-
-					// Use the description and upload time from UserUploadedVideo
-					video = new Video
-					{
-						Description = userUploadedVideo.Description,
-						EmergencyServiceId = userUploadedVideo.EmergencyServiceId,
-						UploadTime = userUploadedVideo.UploadTime // Use the stored upload time
-					};
-				}
-
-				if (video == null)
-					return NotFound(new { Message = $"Video with ID {model.VideoId} not found." });
-
-				// Create the emergency request DTO
-				var emergencyRequest = new EmergencyRequestDTO
-				{
-					UserId = user.UserId,
-					UserName = user.USerName,
-					VideoDescription = video.Description, // Use the video's description
-					Latitude = model.Latitude,
-					Longitude = model.Longitude,
-					TimeStamp = video.UploadTime // Use the stored upload time
-				};
-
-				// Notify the emergency service by sending the request
-				bool isSent = await _emergencyRequest.SendEmergencyRequest(
-					model.UserId,
-					model.VideoId,
-					model.Latitude,
-					model.Longitude);
-
-				if (!isSent)
-					return StatusCode(500, new { Message = "Failed to send emergency request." });
-
-				// Return a successful response with details
-				return Ok(emergencyRequest);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, new { Message = $"Internal server error: {ex.Message}" });
-			}
+			return Ok(new { message = "Emergency request sent successfully." });
 		}
 
+
+
+		#region MyRegion
 		//[HttpPost("select-video")]
 		//public async Task<ActionResult<EmergencyRequestDTO>> SelectVideoForEmergencyRequest([FromBody] SelectVideoRequest model)
 		//{
@@ -332,7 +377,8 @@ namespace Project.API.Controllers
 		//	{
 		//		return StatusCode(500, new { Message = $"Internal server error: {ex.Message}" });
 		//	}
-		//}
+		//} 
+		#endregion
 
 	}
 } 
