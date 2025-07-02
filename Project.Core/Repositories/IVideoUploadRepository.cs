@@ -12,7 +12,6 @@ namespace Project.Core.Repositories
         Task<IEnumerable<UserUploadVideo>> GetUserUploadedVideosAsync(int userId);
         Task<UserUploadVideo> GetUploadVideoAsync(int VideoId);
         Task<UserUploadVideo> AddUserUploadedVideo(UserUploadVideo newVideo);
-        //Task<UserUploadVideo> UpdateVideoAsync(UserUploadVideo video);
         Task<bool> DeleteVideoAsync(int VideoId);
     }
 }

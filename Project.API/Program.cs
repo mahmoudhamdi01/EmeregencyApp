@@ -35,7 +35,6 @@ namespace Project.API
 			builder.Services.AddScoped<IVideoTranslationService, VideoTranslationService>();
 			builder.Services.AddScoped<ITokenServices, TokenServices>();
             builder.Services.AddScoped<IServices, Project.Repositor.Services>();
-            //builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -51,16 +50,6 @@ namespace Project.API
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer();
 
-			#region AI Model
-			//builder.Services.AddSingleton<IAIModelServices>(sp =>
-			//{
-			//	var configuration = sp.GetRequiredService<IConfiguration>();
-			//	var modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
-			//	var flaskServerUrl = configuration["FlaskServerUrl"];
-			//	return new AIModelServices(new HttpClient(), configuration);
-			//}); 
-			#endregion
-
 			builder.Services.AddSingleton<IAIModelServices>(sp =>
 			{
 				var httpClient = new HttpClient();
@@ -68,11 +57,8 @@ namespace Project.API
 				var configuration = sp.GetRequiredService<IConfiguration>();
 				return new AIModelServices(httpClient, configuration);
 			});
-			//string modelPath = Path.Combine(builder.Environment.ContentRootPath, "Model", "best_model.h5");
+			
 
-			// ????? ?????? ?? ????? ?????? ??? ??? Constructor
-			//builder.Services.AddScoped<IAIModelServices>(provider =>
-			//                      new AIModelServices(modelPath));
 			builder.Logging.AddConsole();
 
 			builder.Services.AddCors(options =>
@@ -155,4 +141,3 @@ namespace Project.API
         }
     }
 }
-// D:\Projects\EmergencService\EmergencyApp\Project.API\wwwroot\Model\best_model.h5

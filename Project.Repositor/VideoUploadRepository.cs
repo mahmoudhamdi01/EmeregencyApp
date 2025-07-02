@@ -18,18 +18,6 @@ namespace Project.Repositor
         {
             _dbContext = DbContext;
         }
-        //public async Task<UserUploadVideo> AddUserUploadedVideo(UserUploadVideo newVideo)
-        //{
-        //    if (newVideo == null || string.IsNullOrEmpty(newVideo.VideoUrl))
-        //        return null; // Return null if validation fails
-
-        //    _dbContext.uploadVideos.Add(newVideo);
-        //    await _dbContext.SaveChangesAsync();
-
-        //    // Refresh the entity to include generated values (e.g., UploadedVideoId)
-        //    _dbContext.Entry(newVideo).State = EntityState.Detached;
-        //    return await _dbContext.uploadVideos.FindAsync(newVideo.UploadVideoId);
-        //}
 
         public async Task<UserUploadVideo> AddUserUploadedVideo(UserUploadVideo video)
         {
@@ -39,7 +27,6 @@ namespace Project.Repositor
             _dbContext.uploadVideos.Add(video);
             await _dbContext.SaveChangesAsync();
 
-            // Refresh the entity to include generated values (e.g., UploadedVideoId)
             _dbContext.Entry(video).State = EntityState.Detached;
             return await _dbContext.uploadVideos.FindAsync(video.UploadVideoId);
         }

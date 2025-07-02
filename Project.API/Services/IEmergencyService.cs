@@ -7,7 +7,6 @@ namespace Project.API.Services
     {
         Task<List<EmergencyRequestDTO>> GetRequestsForService(string serviceName);
 
-        // after-update
         Task AddEmergencyRequestAsync(string serviceName, EmergencyRequestDTO request);
     }
 }
